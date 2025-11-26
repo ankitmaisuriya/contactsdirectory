@@ -59,7 +59,7 @@ class _MyContactsState extends State<MyContacts> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               )
             : ListView.builder(
