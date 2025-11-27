@@ -1,3 +1,5 @@
+import 'package:blur/blur.dart';
+import 'package:contactsdirectory/ContactDetails.dart';
 import 'package:contactsdirectory/ContactPOJO.dart';
 import 'package:contactsdirectory/DBHelper.dart';
 import 'package:flutter/material.dart';
@@ -83,10 +85,26 @@ class _MyContactsState extends State<MyContacts> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text(contact.phone!),
+                      subtitle: Wrap(
+
+                        children: [Blur(
+                          borderRadius: BorderRadius.circular(20),
+                          blur: 3.0,
+                          blurColor: Theme.of(context).canvasColor,
+                          child: Text(
+                            contact.phone!,
+                          ),
+                        ),
+                    ]
+                      ),
                       trailing: Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () {
+                      onTap: () async {
+
+                        await Navigator.push(context, MaterialPageRoute(builder: (context) => MyContactDetails(contactPOJO: contact,)));
+                        loadContacts();
+
                         // Handle tap
+                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Contact Details')));
                       },
                     ),
                   );

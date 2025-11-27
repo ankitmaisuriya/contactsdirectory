@@ -9,7 +9,7 @@ class DBHelper {
       version: 1,
       onCreate: (db, version) {
         db.execute(
-          'create table contactlist (id integer primary key autoincrement,name text,phone text)',
+          'create table contactlist (id integer primary key autoincrement,name text,phone text,email text,address text,gender text)',
         );
       },
     );
@@ -31,5 +31,17 @@ class DBHelper {
         .toList();
     db.close();
     return contactlist;
+  }
+
+  Future<void> removeContact(int id) async {
+    final db = await getDatabase();
+    db.delete('contactlist', where: 'id = ?', whereArgs: [id]);
+    db.close();
+  }
+
+  Future<void> updateContact(ContactPOJO contactPOJO) async {
+    final db = await getDatabase();
+    db.update('contactlist',contactPOJO.toMap(),where: 'id = ?', whereArgs: [contactPOJO.id]);
+    db.close();
   }
 }
