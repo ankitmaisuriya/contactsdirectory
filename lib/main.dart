@@ -112,6 +112,7 @@ class _MyContactsState extends State<MyContacts> {
               ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
         child: Icon(Icons.contact_phone,color: Colors.white,),
         onPressed: () {
           showPopupDialog(context);
