@@ -88,6 +88,7 @@ class _MyContactsState extends State<MyContacts> {
                   cursorColor: Colors.white,
                   controller: searchController,
                   autofocus: true,
+                  enableSuggestions: false,
                   decoration: InputDecoration(
                     hintText: 'Search...',
                     hintStyle: TextStyle(color: Colors.white70),
@@ -109,7 +110,7 @@ class _MyContactsState extends State<MyContacts> {
               ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.contact_phone),
+        child: Icon(Icons.contact_phone,color: Colors.white,),
         onPressed: () {
           showPopupDialog(context);
         },

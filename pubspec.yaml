@@ -39,6 +39,8 @@ dependencies:
   share_plus: ^10.0.0
   flutter_speed_dial: ^7.0.0
   url_launcher: ^6.3.0
+  image_picker: ^1.0.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -56,9 +58,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter_icons:
-    android: true
-    ios: true
-    image_path: "assets/icon.png"
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
 flutter:
 
   # The following line ensures that the Material Icons font is

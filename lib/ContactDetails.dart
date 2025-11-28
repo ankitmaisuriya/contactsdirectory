@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:contactsdirectory/ContactPOJO.dart';
 import 'package:contactsdirectory/DBHelper.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,17 +28,18 @@ class _MyContactDetailsState extends State<MyContactDetails> {
   final _formKey = GlobalKey<FormState>();
   final DBHelper _dbHelper = DBHelper();
   bool readOnly = true;
+  File? image;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blue.shade100,
       appBar: AppBar(
         leading: InkWell(
           onTap: () => Navigator.pop(context),
           child: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.blue,
         title: Text(
           'Contacts',
           style: TextStyle(
@@ -117,6 +120,34 @@ class _MyContactDetailsState extends State<MyContactDetails> {
               spacing: 10,
               children: [
                 // Name
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: image != null ? FileImage(image!) : null,
+                      child: image == null
+                          ? Icon(Icons.person, size: 60, color: Colors.blue)
+                          : null,
+                    ),
+                    // Camera icon button (bottom-right)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: InkWell(
+                        onTap: () {
+                         showImageSourceDialog();
+                        },
+                        child: CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.camera_alt, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
                 TextFormField(
                   key: ValueKey('nameField'),
                   initialValue: widget.contactPOJO.name,
@@ -275,10 +306,13 @@ class _MyContactDetailsState extends State<MyContactDetails> {
             child: Icon(Icons.message),
             label: 'Message',
             onTap: () async {
-              final Uri smsUri = Uri(scheme: 'sms', path: widget.contactPOJO.phone);
+              final Uri smsUri = Uri(
+                scheme: 'sms',
+                path: widget.contactPOJO.phone,
+              );
 
               if (await canLaunchUrl(smsUri)) {
-              await launchUrl(smsUri);
+                await launchUrl(smsUri);
               }
             },
           ),
@@ -289,5 +323,43 @@ class _MyContactDetailsState extends State<MyContactDetails> {
 
   Future<void> updateRecords(ContactPOJO contactPOJO) async {
     await _dbHelper.updateContact(contactPOJO);
+  }
+
+  Future<void> pickImage(ImageSource source) async {
+    final file = await ImagePicker().pickImage(source: source);
+    if (file != null) {
+      image = File(file.path);
+      setState(() {});
+    }
+  }
+
+  void showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt),
+              title: Text("Camera"),
+              onTap: () {
+                Navigator.pop(context);
+                pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo),
+              title: Text("Gallery"),
+              onTap: () {
+                Navigator.pop(context);
+                pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
