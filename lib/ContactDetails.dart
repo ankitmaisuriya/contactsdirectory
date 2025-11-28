@@ -284,6 +284,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
       ),
       floatingActionButton: SpeedDial(
         icon: Icons.more_vert_outlined,
+        iconTheme: IconThemeData(color: Colors.white),
         activeIcon: Icons.close,
         backgroundColor: Colors.blue,
         children: [
