@@ -25,28 +25,88 @@ class MyContacts extends StatefulWidget {
 class _MyContactsState extends State<MyContacts> {
   final DBHelper _dbHelper = DBHelper();
   List<ContactPOJO> _list = [];
+  List<ContactPOJO> filteredList = [];
+  bool _isSearching = false;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     loadContacts();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blue.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Contacts',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        elevation: 0,
+        // removes bottom shadow line
+        scrolledUnderElevation: 0,
+        // for Material 3
+        bottomOpacity: 0,
+        shape: Border(bottom: BorderSide(color: Colors.transparent, width: 0)),
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        backgroundColor: Colors.blue,
+        actions: [
+          _isSearching
+              ? IconButton(
+                  onPressed: () {
+                    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Close')));
+                    setState(() {
+                      _isSearching = false;
+                      searchController.clear();
+                      loadContacts();
+                    });
+                  },
+                  icon: Icon(Icons.close, color: Colors.white),
+                )
+              : IconButton(
+                  onPressed: () {
+                    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Search')));
+                    setState(() {
+                      _isSearching = true;
+                    });
+                  },
+                  icon: Icon(Icons.search, color: Colors.white),
+                ),
+        ],
+        title: _isSearching
+            ? Theme(
+                data: Theme.of(context).copyWith(
+                  inputDecorationTheme: InputDecorationTheme(
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+                child: TextField(
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.white,
+                  controller: searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.white70),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  ),
+                  onChanged: (value) {
+                    print(value);
+                    searchResult(value);
+                  },
+                ),
+              )
+            : Text(
+                'Contacts',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.contact_phone),
@@ -66,7 +126,7 @@ class _MyContactsState extends State<MyContacts> {
               )
             : ListView.builder(
                 itemBuilder: (context, index) {
-                  ContactPOJO contact = _list[index];
+                  ContactPOJO contact = filteredList[index];
                   return Card(
                     elevation: 2,
                     margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -86,21 +146,28 @@ class _MyContactsState extends State<MyContacts> {
                         ),
                       ),
                       subtitle: Wrap(
-
-                        children: [Blur(
-                          borderRadius: BorderRadius.circular(20),
-                          blur: 3.0,
-                          blurColor: Theme.of(context).canvasColor,
-                          child: Text(
-                            contact.phone!,
+                        children: [
+                          Blur(
+                            borderRadius: BorderRadius.circular(20),
+                            blur: 3.0,
+                            blurColor: Theme.of(context).canvasColor,
+                            child: Text(contact.phone!),
                           ),
-                        ),
-                    ]
+                        ],
                       ),
-                      trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.blue,
+                        size: 16,
+                      ),
                       onTap: () async {
-
-                        await Navigator.push(context, MaterialPageRoute(builder: (context) => MyContactDetails(contactPOJO: contact,)));
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MyContactDetails(contactPOJO: contact),
+                          ),
+                        );
                         loadContacts();
 
                         // Handle tap
@@ -109,7 +176,7 @@ class _MyContactsState extends State<MyContacts> {
                     ),
                   );
                 },
-                itemCount: _list.length,
+                itemCount: filteredList.length,
               ),
       ),
     );
@@ -214,6 +281,19 @@ class _MyContactsState extends State<MyContacts> {
     _list.sort(
       (a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()),
     );
-    setState(() {});
+    setState(() {
+      filteredList = _list;
+    });
+  }
+
+  void searchResult(String str) {
+    setState(() {
+      filteredList = _list
+          .where(
+            (element) =>
+                element.name!.toLowerCase().contains(str.toLowerCase()),
+          )
+          .toList();
+    });
   }
 }

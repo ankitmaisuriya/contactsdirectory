@@ -1,8 +1,9 @@
 import 'package:contactsdirectory/ContactPOJO.dart';
 import 'package:contactsdirectory/DBHelper.dart';
-import 'package:contactsdirectory/main.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // void main() {
 //   runApp(const MyApp());
@@ -51,13 +52,15 @@ class _MyContactDetailsState extends State<MyContactDetails> {
               children: [
                 IconButton(
                   disabledColor: Colors.grey,
-                color: Colors.white,
-                  onPressed: _selectedPage == 1 ? () async {
-                    if(!_formKey.currentState!.validate())return;
-                    _formKey.currentState!.save();/**/
-                    await updateRecords(widget.contactPOJO);
-                  } : null,
-                  icon:  Icon(Icons.save),
+                  color: Colors.white,
+                  onPressed: _selectedPage == 1
+                      ? () async {
+                          if (!_formKey.currentState!.validate()) return;
+                          _formKey.currentState!.save(); /**/
+                          await updateRecords(widget.contactPOJO);
+                        }
+                      : null,
+                  icon: Icon(Icons.save),
                 ),
                 IconButton(
                   onPressed: () {
@@ -172,7 +175,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
                     }
                     return null;
                   },
-                  onSaved:  (newValue) => widget.contactPOJO.email = newValue,
+                  onSaved: (newValue) => widget.contactPOJO.email = newValue,
                 ),
                 SizedBox(height: 16),
 
@@ -198,12 +201,12 @@ class _MyContactDetailsState extends State<MyContactDetails> {
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: "Gender"),
                   value: widget.contactPOJO.gender,
-                  items: [ "Male", "Female"].map((g) {
+                  items: ["Male", "Female"].map((g) {
                     return DropdownMenuItem(value: g, child: Text(g));
                   }).toList(),
                   //onChanged: (v) => gender = v!,
                   onChanged: readOnly ? null : (value) => gender = value!,
-                    onSaved: (newValue) => widget.contactPOJO.gender = newValue,
+                  onSaved: (newValue) => widget.contactPOJO.gender = newValue,
                 ),
 
                 SizedBox(height: 20),
@@ -230,10 +233,10 @@ class _MyContactDetailsState extends State<MyContactDetails> {
           }*/
           readOnly = _selectedPage != 1;
           if (_selectedPage == 2) {
-              Share.share(
-                '${widget.contactPOJO.name} : ${widget.contactPOJO.phone}',
+            Share.share(
+              '${widget.contactPOJO.name} : ${widget.contactPOJO.phone}',
               subject: 'Contact Detail:',
-            ) ;
+            );
           }
           setState(() {});
         },
@@ -247,11 +250,44 @@ class _MyContactDetailsState extends State<MyContactDetails> {
           // ),
         ],
       ),
+      floatingActionButton: SpeedDial(
+        icon: Icons.more_vert_outlined,
+        activeIcon: Icons.close,
+        backgroundColor: Colors.blue,
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.call),
+            label: 'Call',
+            onTap: () async {
+              final Uri callUri = Uri(
+                scheme: 'tel',
+                path: widget.contactPOJO.phone,
+              );
+
+              if (await canLaunchUrl(callUri)) {
+                await launchUrl(callUri);
+              } else {
+                print('Could not launch $callUri');
+              }
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.message),
+            label: 'Message',
+            onTap: () async {
+              final Uri smsUri = Uri(scheme: 'sms', path: widget.contactPOJO.phone);
+
+              if (await canLaunchUrl(smsUri)) {
+              await launchUrl(smsUri);
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 
-  updateRecords(ContactPOJO contactPOJO) async {
-    print(contactPOJO.name);
+  Future<void> updateRecords(ContactPOJO contactPOJO) async {
     await _dbHelper.updateContact(contactPOJO);
   }
 }
