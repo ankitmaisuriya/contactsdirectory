@@ -61,6 +61,10 @@ class _MyContactDetailsState extends State<MyContactDetails> {
                           if (!_formKey.currentState!.validate()) return;
                           _formKey.currentState!.save(); /**/
                           await updateRecords(widget.contactPOJO);
+                          setState(() {
+                            _selectedPage = 0;
+                            readOnly = true;
+                          });
                         }
                       : null,
                   icon: Icon(Icons.save),
@@ -150,6 +154,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
                 ),
                 SizedBox(height: 20),
                 TextFormField(
+                  ignorePointers: readOnly ,
                   key: ValueKey('nameField'),
                   initialValue: widget.contactPOJO.name,
                   readOnly: readOnly,
@@ -169,6 +174,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
 
                 // Phone
                 TextFormField(
+                  ignorePointers: readOnly ,
                   initialValue: widget.contactPOJO.phone,
                   readOnly: readOnly,
                   keyboardType: TextInputType.number,
@@ -191,6 +197,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
 
                 // Email
                 TextFormField(
+                  ignorePointers: readOnly ,
                   initialValue: widget.contactPOJO.email,
                   readOnly: readOnly,
                   keyboardType: TextInputType.emailAddress,
@@ -213,6 +220,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
 
                 // Address
                 TextFormField(
+                  ignorePointers: readOnly ,
                   initialValue: widget.contactPOJO.address,
                   readOnly: readOnly,
                   maxLines: 3,
@@ -264,18 +272,18 @@ class _MyContactDetailsState extends State<MyContactDetails> {
             readOnly = false;
           }*/
           readOnly = _selectedPage != 1;
-          if (_selectedPage == 2) {
-            Share.share(
-              '${widget.contactPOJO.name} : ${widget.contactPOJO.phone}',
-              subject: 'Contact Detail:',
-            );
-          }
+          // if (_selectedPage == 2) {
+          //   Share.share(
+          //     '${widget.contactPOJO.name} : ${widget.contactPOJO.phone}',
+          //     subject: 'Contact Detail:',
+          //   );
+          // }
           setState(() {});
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.info), label: "Info"),
           BottomNavigationBarItem(icon: Icon(Icons.edit), label: "Edit"),
-          BottomNavigationBarItem(icon: Icon(Icons.share), label: "Share"),
+          //BottomNavigationBarItem(icon: Icon(Icons.share), label: "Share"),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.delete,),
           //   label: "Delete",
@@ -316,6 +324,16 @@ class _MyContactDetailsState extends State<MyContactDetails> {
               if (await canLaunchUrl(smsUri)) {
                 await launchUrl(smsUri);
               }
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.share),
+            label: 'Share',
+            onTap: ()  {
+              Share.share(
+                '${widget.contactPOJO.name} : ${widget.contactPOJO.phone}',
+                subject: 'Contact Detail:',
+              );
             },
           ),
         ],
