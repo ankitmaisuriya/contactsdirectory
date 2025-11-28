@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:blur/blur.dart';
 import 'package:contactsdirectory/ContactDetails.dart';
 import 'package:contactsdirectory/ContactPOJO.dart';
@@ -133,11 +135,12 @@ class _MyContactsState extends State<MyContacts> {
                     margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     child: ListTile(
                       leading: CircleAvatar(
-                        child: Text(
+                        backgroundColor: Colors.blue,
+                        backgroundImage:  contact.image != null ? FileImage(File(contact.image!)) : null,
+                        child: contact.image != null ? null : Text(
                           contact.name!.substring(0, 1).toUpperCase(),
                           style: TextStyle(color: Colors.white),
                         ),
-                        backgroundColor: Colors.blue,
                       ),
                       title: Text(
                         contact.name!,

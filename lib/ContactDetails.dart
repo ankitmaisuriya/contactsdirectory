@@ -125,8 +125,8 @@ class _MyContactDetailsState extends State<MyContactDetails> {
                     CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.grey[200],
-                      backgroundImage: image != null ? FileImage(image!) : null,
-                      child: image == null
+                      backgroundImage: widget.contactPOJO.image != null ? FileImage(File(widget.contactPOJO.image!)) : null,
+                      child: widget.contactPOJO.image == null
                           ? Icon(Icons.person, size: 60, color: Colors.blue)
                           : null,
                     ),
@@ -136,6 +136,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
                       right: 0,
                       child: InkWell(
                         onTap: () {
+                          readOnly ? null:
                          showImageSourceDialog();
                         },
                         child: CircleAvatar(
@@ -328,7 +329,7 @@ class _MyContactDetailsState extends State<MyContactDetails> {
   Future<void> pickImage(ImageSource source) async {
     final file = await ImagePicker().pickImage(source: source);
     if (file != null) {
-      image = File(file.path);
+      widget.contactPOJO.image = file.path;
       setState(() {});
     }
   }
